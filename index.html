@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Elizan ❤️ Berke</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            overflow: hidden;
+            color: #fff;
+            font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background:
+                radial-gradient(circle at 50% 48%, rgba(140, 0, 50, 0.32) 0%, rgba(38, 0, 18, 0.15) 35%, rgba(3, 0, 4, 0) 65%),
+                #030004;
+        }
+
+        #heartCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .left-top-badge,
+        .music-button {
+            position: fixed;
+            top: 20px;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border: 1px solid rgba(255, 45, 95, 0.5);
+            border-radius: 999px;
+            background: rgba(14, 4, 10, 0.75);
+            backdrop-filter: blur(12px);
+            color: #ffd0da;
+            box-shadow: 0 0 15px rgba(255, 0, 75, 0.25);
+        }
+
+        .left-top-badge {
+            left: 20px;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .music-button {
+            right: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .music-button:hover {
+            transform: scale(1.04);
+            background: rgba(65, 8, 30, 0.85);
+        }
+
+        .badge-heart,
+        .music-icon {
+            color: #ff2d60;
+            text-shadow: 0 0 8px rgba(255, 23, 79, 0.9);
+        }
+
+        #youtubePlayer {
+            position: fixed;
+            left: -100px;
+            top: -100px;
+            width: 1px;
+            height: 1px;
+            opacity: 0.001;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .content {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            z-index: 10;
+            width: min(92vw, 610px);
+            transform: translate(-50%, -45%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .main-name {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(56px, 7vw, 96px);
+            font-weight: 500;
+            line-height: 0.94;
+            letter-spacing: 8px;
+            color: #ff426d;
+            text-shadow:
+                0 0 4px rgba(255, 255, 255, 0.75),
+                0 0 11px rgba(255, 23, 79, 0.9),
+                0 0 25px rgba(255, 0, 72, 0.5);
+            will-change: transform;
+            animation: titleBeat 1.05s linear infinite;
+        }
+
+        .subtitle {
+            margin-top: 13px;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(13px, 1.45vw, 18px);
+            font-style: italic;
+            letter-spacing: 3.2px;
+            color: rgba(255, 231, 237, 0.92);
+            text-shadow: 0 0 9px rgba(255, 62, 108, 0.28);
+        }
+
+        .message-card {
+            width: min(90vw, 500px);
+            margin-top: 20px;
+            padding: 17px 24px 15px;
+            border: 1px solid rgba(255, 42, 91, 0.46);
+            border-radius: 17px;
+            background: linear-gradient(180deg, rgba(25, 4, 14, 0.88), rgba(8, 1, 6, 0.9));
+            backdrop-filter: blur(15px);
+            box-shadow: 0 0 23px rgba(255, 0, 68, 0.14);
+        }
+
+        .message {
+            font-size: clamp(13px, 1.25vw, 16px);
+            line-height: 1.52;
+            font-weight: 300;
+            color: #ffe8ee;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            width: 74%;
+            margin: 11px auto 6px;
+            gap: 10px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            height: 1px;
+            flex: 1;
+        }
+
+        .divider::before {
+            background: linear-gradient(90deg, transparent, rgba(255, 40, 90, 0.65));
+        }
+
+        .divider::after {
+            background: linear-gradient(90deg, rgba(255, 40, 90, 0.65), transparent);
+        }
+
+        .divider-heart {
+            color: #ff315f;
+            font-size: 16px;
+            text-shadow: 0 0 8px rgba(255, 23, 79, 0.9);
+        }
+
+        .final-message {
+            font-size: clamp(12px, 1.2vw, 15px);
+            font-weight: 600;
+            color: #ff6686;
+        }
+
+        @keyframes titleBeat {
+            0%, 100% { transform: scale(1); }
+            5% { transform: scale(1.03); }
+            10% { transform: scale(1); }
+            18% { transform: scale(1.015); }
+            24% { transform: scale(1); }
+        }
+
+        @media (max-width: 650px) {
+            .left-top-badge,
+            .music-button {
+                top: 12px;
+                padding: 8px 12px;
+                font-size: 11px;
+            }
+
+            .left-top-badge { left: 12px; }
+            .music-button { right: 12px; }
+
+            .content {
+                transform: translate(-50%, -42%);
+            }
+
+            .main-name {
+                letter-spacing: 5px;
+            }
+
+            .subtitle {
+                margin-top: 9px;
+                letter-spacing: 2px;
+            }
+
+            .message-card {
+                margin-top: 14px;
+                padding: 14px 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="left-top-badge">
+        <span>Elizan</span>
+        <span class="badge-heart">♥</span>
+        <span>Berke</span>
+    </div>
+
+    <div class="music-button" id="musicButton">
+        <span class="music-icon">♫</span>
+        <span id="musicText">Çalmak İçin Tıkla</span>
+    </div>
+
+    <canvas id="heartCanvas"></canvas>
+
+    <main class="content">
+        <div class="main-name">ELİZAN</div>
+        <div class="subtitle">Sen Benim En Güzel Hikayemsin</div>
+
+        <div class="message-card">
+            <div class="message">
+                “Herkes çiçek alır... Ben senin için dünyadaki en güzel kalbi kodladım.”
+            </div>
+
+            <div class="divider">
+                <span class="divider-heart">♥</span>
+            </div>
+
+            <div class="final-message">✨ İyi Ki Varsın Elizan ✨</div>
+        </div>
+    </main>
+
+    <div id="youtubePlayer" aria-hidden="true"></div>
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <script>
+        const CONFIG = {
+            words: [
+                "Elizan",
+                "Meleğim",
+                "Ömrüm",
+                "Güzelim",
+                "Seni Seviyorum",
+                "Her Şeyim",
+                "Bir Tanem"
+            ],
+            colors: ["#ff1a53", "#ff3366", "#ff527b", "#ff7395"],
+            youtubeVideoId: "66A_3uwuZ_I",
+            startTime: 138, // 2:18
+            endTime: 166    // 2:46
+        };
+
+        /* MÜZİK DÖNGÜSÜ & KONTROLÜ */
+        const musicButton = document.getElementById("musicButton");
+        const musicText = document.getElementById("musicText");
+
+        let youtubePlayer = null;
+        let playerReady = false;
+        let isPlaying = false;
+
+        window.onYouTubeIframeAPIReady = function () {
+            youtubePlayer = new YT.Player("youtubePlayer", {
+                width: "1",
+                height: "1",
+                videoId: CONFIG.youtubeVideoId,
+                playerVars: {
+                    controls: 0,
+                    disablekb: 1,
+                    playsinline: 1,
+                    rel: 0,
+                    autoplay: 1,
+                    start: CONFIG.startTime,
+                    end: CONFIG.endTime
+                },
+                events: {
+                    onReady(event) {
+                        playerReady = true;
+                        event.target.setVolume(100);
+                        playMusic();
+                    },
+                    onStateChange(event) {
+                        if (event.data === YT.PlayerState.PLAYING) {
+                            isPlaying = true;
+                            musicText.textContent = "Elizan İçin Çalıyor ♫";
+                        } else if (event.data === YT.PlayerState.PAUSED) {
+                            isPlaying = false;
+                            musicText.textContent = "Çalmak İçin Tıkla";
+                        } else if (event.data === YT.PlayerState.ENDED) {
+                            playMusic();
+                        }
+                    }
+                }
+            });
+        };
+
+        function playMusic() {
+            if (youtubePlayer && playerReady) {
+                youtubePlayer.seekTo(CONFIG.startTime, true);
+                youtubePlayer.playVideo();
+            }
+        }
+
+        setInterval(() => {
+            if (youtubePlayer && playerReady && isPlaying) {
+                const currentTime = youtubePlayer.getCurrentTime();
+                if (currentTime >= CONFIG.endTime || currentTime < CONFIG.startTime - 1) {
+                    playMusic();
+                }
+            }
+        }, 150);
+
+        // Ekranın herhangi bir yerine tıklanırsa müziği başlatır (Kısıtlamaları aşmak için)
+        document.body.addEventListener('click', () => {
+            if (!isPlaying) {
+                playMusic();
+            }
+        });
+
+        musicButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (isPlaying) {
+                youtubePlayer.pauseVideo();
+            } else {
+                playMusic();
+            }
+        });
+
+        /* CANVAS VE HIZLANDIRILMIŞ / YÜKSEK GENLİKLİ KALP ATIŞI */
+        const canvas = document.getElementById("heartCanvas");
+        const ctx = canvas.getContext("2d", { alpha: true });
+
+        let width = 0;
+        let height = 0;
+        let dpr = 1;
+
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+
+            const nativeDpr = window.devicePixelRatio || 1;
+            dpr = Math.min(nativeDpr, width > 1100 ? 1.25 : 1.5);
+
+            canvas.width = Math.round(width * dpr);
+            canvas.height = Math.round(height * dpr);
+            canvas.style.width = width + "px";
+            canvas.style.height = height + "px";
+
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.imageSmoothingEnabled = true;
+        }
+
+        function heartPoint(angle, scale) {
+            const x = 16 * Math.pow(Math.sin(angle), 3);
+            const y = 13 * Math.cos(angle)
+                    - 5 * Math.cos(2 * angle)
+                    - 2 * Math.cos(3 * angle)
+                    - Math.cos(4 * angle);
+
+            return {
+                x: x * scale,
+                y: -y * scale
+            };
+        }
+
+        function getHeartGeometry() {
+            const scale = Math.min(width / 38, height / 28);
+            return {
+                centerX: width / 2,
+                centerY: height / 2 - (width < 650 ? 4 : 12),
+                scale
+            };
+        }
+
+        // Kalp Atış Genliği Artırıldı (Genişleme mesafesi yükseltildi)
+        function pulseWindow(phase, start, end, amplitude) {
+            if (phase < start || phase > end) return 0;
+            const t = (phase - start) / (end - start);
+            const s = Math.sin(Math.PI * t);
+            return amplitude * s * s;
+        }
+
+        function getHeartbeat(timeSeconds) {
+            const cycle = 1.05; 
+            const phase = (timeSeconds % cycle) / cycle;
+
+            // Genlikler 0.12 ve 0.06 seviyesine çıkarıldı (Atış mesafesi çok belirgin oldu)
+            const first = pulseWindow(phase, 0.015, 0.14, 0.12);
+            const second = pulseWindow(phase, 0.18, 0.29, 0.06);
+
+            return 1 + first + second;
+        }
+
+        /* SPRITE CACHE */
+        const spriteCache = new Map();
+
+        function makeWordSprite(text, fontSize, color) {
+            const key = `${text}|${fontSize}|${color}`;
+            if (spriteCache.has(key)) return spriteCache.get(key);
+
+            const ratio = 2;
+            const off = document.createElement("canvas");
+            const offCtx = off.getContext("2d");
+
+            offCtx.font = `bold ${fontSize * ratio}px "Segoe UI", sans-serif`;
+            const measured = offCtx.measureText(text).width;
+            const pad = 10 * ratio;
+
+            off.width = Math.ceil(measured + pad * 2);
+            off.height = Math.ceil(fontSize * ratio * 2.05);
+
+            const drawCtx = off.getContext("2d");
+            drawCtx.font = `bold ${fontSize * ratio}px "Segoe UI", sans-serif`;
+            drawCtx.textAlign = "center";
+            drawCtx.textBaseline = "middle";
+            drawCtx.fillStyle = color;
+            drawCtx.shadowColor = "rgba(255, 15, 75, 0.95)";
+            drawCtx.shadowBlur = 7 * ratio;
+            drawCtx.fillText(text, off.width / 2, off.height / 2);
+
+            const sprite = {
+                canvas: off,
+                width: off.width / ratio,
+                height: off.height / ratio
+            };
+
+            spriteCache.set(key, sprite);
+            return sprite;
+        }
+
+        function randomFrom(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+
+        /* ÇİZGİYİ TAMAMEEN KAPLAYAN AŞIRI YOĞUN KELİMELER */
+        let wordParticles = [];
+
+        class WordParticle {
+            constructor(angle) {
+                this.angle = angle;
+                this.speed = 0.20 + Math.random() * 0.12; 
+                this.opacity = 0.82 + Math.random() * 0.18;
+
+                const text = randomFrom(CONFIG.words);
+                const color = randomFrom(CONFIG.colors);
+                const size = width < 650 ? (11 + Math.floor(Math.random() * 3)) : (14 + Math.floor(Math.random() * 4));
+
+                this.sprite = makeWordSprite(text, size, color);
+            }
+
+            update(delta) {
+                this.angle += this.speed * delta;
+                if (this.angle > Math.PI * 2) {
+                    this.angle -= Math.PI * 2;
+                }
+            }
+
+            draw(heartbeatScale) {
+                const geometry = getHeartGeometry();
+                const p = heartPoint(this.angle, geometry.scale * 1.08 * heartbeatScale);
+
+                const x = geometry.centerX + p.x;
+                const y = geometry.centerY + p.y;
+
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.drawImage(
+                    this.sprite.canvas,
+                    x - this.sprite.width / 2,
+                    y - this.sprite.height / 2,
+                    this.sprite.width,
+                    this.sprite.height
+                );
+                ctx.restore();
+            }
+        }
+
+        function createWordParticles() {
+            wordParticles = [];
+            // Sayı 140 ila 220 seviyesine çıkarıldı (Aşırı yoğun görünüm)
+            const count = width < 650 ? 140 : 220; 
+            for (let i = 0; i < count; i++) {
+                const angle = (i / count) * Math.PI * 2;
+                wordParticles.push(new WordParticle(angle));
+            }
+        }
+
+        /* PARLAK KALP ÇİZGİSİ */
+        const heartAngles = Array.from({ length: 240 }, (_, i) => (
+            (i / 239) * Math.PI * 2
+        ));
+
+        function drawHeartOutline(heartbeatScale) {
+            const geometry = getHeartGeometry();
+
+            ctx.save();
+            ctx.beginPath();
+
+            for (let i = 0; i < heartAngles.length; i++) {
+                const p = heartPoint(
+                    heartAngles[i],
+                    geometry.scale * 1.08 * heartbeatScale
+                );
+
+                const x = geometry.centerX + p.x;
+                const y = geometry.centerY + p.y;
+
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+
+            ctx.closePath();
+            ctx.strokeStyle = "rgba(255, 35, 87, 0.75)";
+            ctx.lineWidth = 3;
+            ctx.shadowColor = "rgba(255, 0, 72, 1)";
+            ctx.shadowBlur = 16;
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        /* EKG ALT NABIZ ÇİZGİSİ */
+        function drawEKGLine(timeSeconds, heartbeatScale) {
+            ctx.save();
+            ctx.beginPath();
+            
+            const lineY = height - (width < 650 ? 25 : 40);
+            const speed = 160; 
+            const xOffset = (timeSeconds * speed) % width;
+
+            ctx.moveTo(0, lineY);
+
+            for (let x = 0; x < width; x += 3) {
+                let y = lineY;
+                const distFromPulse = (x - xOffset + width) % width;
+
+                if (distFromPulse > 0 && distFromPulse < 80) {
+                    const norm = distFromPulse / 80;
+                    const peak = Math.sin(norm * Math.PI * 4) * (26 * (heartbeatScale - 0.95));
+                    y -= peak;
+                }
+
+                ctx.lineTo(x, y);
+            }
+
+            ctx.strokeStyle = "rgba(255, 20, 75, 0.6)";
+            ctx.lineWidth = 2;
+            ctx.shadowColor = "rgba(255, 0, 80, 0.9)";
+            ctx.shadowBlur = 10;
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        /* ARKA PLAN PARÇACIKLARI */
+        let backgroundParticles = [];
+
+        class BackgroundParticle {
+            constructor() {
+                this.reset(true);
+            }
+
+            reset(initial = false) {
+                this.x = Math.random() * width;
+                this.y = initial ? Math.random() * height : height + 8;
+                this.radius = 0.45 + Math.random() * 1.25;
+                this.speed = 5 + Math.random() * 11;
+                this.alpha = 0.08 + Math.random() * 0.30;
+                this.drift = (Math.random() - 0.5) * 4;
+            }
+
+            update(delta) {
+                this.y -= this.speed * delta;
+                this.x += this.drift * delta;
+
+                if (this.y < -8) this.reset(false);
+            }
+
+            draw() {
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = "#ff315f";
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function createBackgroundParticles() {
+            backgroundParticles = [];
+            const count = width < 650 ? 18 : 30;
+
+            for (let i = 0; i < count; i++) {
+                backgroundParticles.push(new BackgroundParticle());
+            }
+        }
+
+        /* RESIZE & REBUILD */
+        let resizeTimer = null;
+
+        function rebuildScene() {
+            resizeCanvas();
+            spriteCache.clear();
+            createWordParticles();
+            createBackgroundParticles();
+        }
+
+        window.addEventListener("resize", () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(rebuildScene, 120);
+        });
+
+        rebuildScene();
+
+        /* ANİMASYON DÖNGÜSÜ */
+        let lastTime = performance.now();
+        let animationId = null;
+
+        function animate(now) {
+            const timeSec = now / 1000;
+            const delta = Math.min((now - lastTime) / 1000, 0.033);
+            lastTime = now;
+
+            ctx.clearRect(0, 0, width, height);
+
+            const heartbeatScale = getHeartbeat(timeSec);
+
+            ctx.globalAlpha = 1;
+            drawHeartOutline(heartbeatScale);
+            drawEKGLine(timeSec, heartbeatScale);
+
+            for (const particle of backgroundParticles) {
+                particle.update(delta);
+                particle.draw();
+            }
+
+            for (const particle of wordParticles) {
+                particle.update(delta);
+                particle.draw(heartbeatScale);
+            }
+
+            ctx.globalAlpha = 1;
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function startAnimation() {
+            if (animationId !== null) return;
+            lastTime = performance.now();
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function stopAnimation() {
+            if (animationId === null) return;
+            cancelAnimationFrame(animationId);
+            animationId = null;
+        }
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) stopAnimation();
+            else startAnimation();
+        });
+
+        startAnimation();
+    </script>
+</body>
+</html>
